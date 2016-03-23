@@ -8,7 +8,7 @@ function promptForCredentials()
     
     bootbox.confirm("<form id='logindetails' action=''>\
                     <span style='color:#1d9d74'>REST Services URL, pointing to Home: services.json</span><br>\
-                    <input type='text' class='form-control' placeholder='http://127.0.0.1:8080/dctm-rest/services.json' name='serverurl'></input><br/>\
+                    <input type='text' class='form-control' placeholder='"+document.location.origin+"/dctm-rest/services.json' name='serverurl'></input><br/>\
                     <span style='color:#1d9d74'>User Name</span><br>\
                     <input type='text' class='form-control'  name='username'></input><br/>\
                     <span style='color:#1d9d74'>Password</span><br>\
@@ -16,7 +16,11 @@ function promptForCredentials()
                     </form>", function(result) {
                                 if(result) {
                                     var loginForm = document.forms['logindetails'];
-                                    setHomeUri(loginForm.elements['serverurl'].value);
+                                    var homeUri = loginForm.elements['serverurl'].value;
+                                    if(!homeUri){
+                                    	homeUri = loginForm.elements['serverurl'].placeholder;
+                                    }
+                                    setHomeUri(homeUri);
                                     setBasicAuthFormattedCredentials(prepareCredentialsForBasicAuth(loginForm.elements['username'].value,loginForm.elements['password'].value));
                                     resetNavigation();
                                 }
@@ -48,6 +52,10 @@ function editProfile()
                                 }
                             }
     );
+}
+
+function resourceNotSupport() {
+    bootbox.alert("This resource is currently not supported",function(result) {});      
 }
 
 // Delete asset from here   

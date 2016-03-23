@@ -65,6 +65,10 @@ app.controller('mainViewController', ['$scope', '$http', '$log',
      
         // This is action when user clicks on an item  
         $scope.followOnClick = function (entry) {
+        	if(entry.notSupported){
+        		resourceNotSupport();
+        		return;
+        	}	
             saveCurrentLocation(entry.uri);
             asyncRefreshView($scope,entry.uri,'progressFeedback');
         };
@@ -112,6 +116,12 @@ app.controller('mainViewController', ['$scope', '$http', '$log',
             showElement('progressFeedback');
             initiateProgress();
             var uri = getCurrentObjectCheckOutUri();
+            if(!uri || uri=== 'null'){
+            	hideElement('progressFeedback');
+            	progressCompleted = true;
+                $scope.$apply(); 
+            	return;
+            }
             $.when(applyData(uri,"PUT")
             ).done(function(data) {
                 setCurrentObjectJsonRepresentation(data);
@@ -136,9 +146,9 @@ app.controller('mainViewController', ['$scope', '$http', '$log',
                 ).done(function(refreshedData) {
                    setCurrentObjectJsonRepresentation(refreshedData);
                    progressCompleted = true;
-                    resetActiveButtons();
-                    hideElement('progressFeedback');
-                    $scope.$apply(); 
+                   resetWidgets();
+                   hideElement('progressFeedback');
+                   $scope.$apply(); 
                 });
             }); 
         };
@@ -161,10 +171,9 @@ app.controller('mainViewController', ['$scope', '$http', '$log',
             showElement('progressFeedbackCheckin');
             initiateProgressUpload('checkinProgress');
             uploadContent(checkinUri,true).then(function (data) {
-                var uri = findUrlForLinkRelation(data,"self");
+                var uri = findUrlForLinkRelation(data,constants.linkRelationSelf);
                 hideElement('progressFeedbackCheckin');
                 switchToHomeTab();
-                resetActiveButtons();
                 asyncRefreshView($scope,uri,'progressFeedback'); 
             }, function (error) {
                 bootbox.confirm("An error occurred, HTTP Request object came back with and Error: <br>\
@@ -246,12 +255,14 @@ function resetSearch($scope) {
 
 // Common reset for Preview area
 function resetPreview($scope) {
-    //$scope.properties = new Array();
     $scope.updatableProperties = new Array();
     $scope.internalProperties = new Array();
     $scope.applicationProperties = new Array();
     $scope.readOnlyProperties = new Array();
+    $scope.typeProperties = new Array();
+    $scope.batchableResources = new Array();
     $scope.links = new Array();
+    
 }
 
 // Common reset for cabinet/folder view
@@ -425,9 +436,9 @@ function asyncRefreshView($scope,uri,progressElement) {
             } else {
                 setCurrentObjectJsonRepresentation(data);
                 var primaryContentUri = findUrlGivenLinkRelation(data,constants.linkRelationPrimaryContent);
-                getDownloadUri($scope,primaryContentUri);
+                getDownloadUri($scope,primaryContentUri+"?media-url-policy=LOCAL");
             }
-            saveCurrentLocation(uri);
+            saveCurrentLocation(findUrlForLinkRelation(data,constants.linkRelationSelf));
             resetLightBoxView($scope);
             if (needToFetchPreviewContent)
                 resetPreview($scope);
@@ -472,7 +483,42 @@ function asyncRefreshView($scope,uri,progressElement) {
         case resourceType.checkedout:
             var processedData = getDataFromEntries(data);
             $scope.checkedoutlistview = processedData.pop();
-            //hideElement('checkedOutProgressFeedback');
+            switchToCheckedOutTab();
+            hideElement('checkedOutProgressFeedback');
+            break;
+        case resourceType.type:
+        	var self = findContentUrlForRelation(data,constants.linkRelationSelf);
+            appendToBreadCrumbs(data.name,self);
+            setCurrentObjectJsonRepresentation(data);
+            var icon = constants.typeStaticImage;
+            var dataArray = new Array();
+            dataArray.push({
+                preview: icon
+            });
+            $scope.links = dataArray;
+            saveCurrentLocation(self);
+            resetLightBoxView($scope);
+            resetFolderView($scope);
+            var processedData = getTypePropertyInfoFromProperties(data);
+            $scope.typeProperties = processedData;
+            $scope.breadcrumbsData = getBreadcrumbs();
+            break;
+        case resourceType.batchableResources:
+        	var self = findContentUrlForRelation(data,constants.linkRelationSelf);
+            appendToBreadCrumbs("batchable-resources",self);
+            setCurrentObjectJsonRepresentation(data);
+            var icon = constants.uknownStaticImage;
+            var dataArray = new Array();
+            dataArray.push({
+                preview: icon
+            });
+            $scope.links = dataArray;
+            saveCurrentLocation(self);
+            resetLightBoxView($scope);
+            resetFolderView($scope);
+            var batchableResources = getBatchableResourcesFromData(data);
+            $scope.batchableResources = batchableResources;
+            $scope.breadcrumbsData = getBreadcrumbs();
             break;
         case resourceType.unknown:
             
@@ -492,15 +538,15 @@ function asyncRefreshView($scope,uri,progressElement) {
     });
 }
 
-function prepareDownloadLink($scope) {
-    $.when(fetchData(getCurrentObjectReference())
-    ).done(function(data) {
-       var uri = findUrlGivenLinkRelation(data,constants.linkRelationPrimaryContent); 
-       getDownloadUri($scope,uri);   
-    });
-}
 function getDownloadUri($scope,uri) {
-    $.when(fetchData(uri)
+    $.when(fetchData(uri,{error:function(){
+    	$scope.downloaduri = undefined;
+    	setTimeout(function(){
+	    	if(!$(document.getElementById('downloadButton')).hasClass("disabled")){
+	    		$(document.getElementById('downloadButton')).addClass("disabled");
+	    	}
+    	},100);
+    }})
     ).done(function(data) {
        var uri = findUrlGivenLinkRelation(data,constants.linkRelationContentMedia); 
        $scope.downloaduri = uri;
@@ -627,30 +673,26 @@ function getStoryBoardImage(storyUrl) {
     });
 }
 
-function fetchData(url) {
-    return $.ajax({
-        cache: false,
-        type: "GET",
-        async: true,
-        url: url,
-        contentType: "application/json",
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Basic " + getBasicAuthFormattedCredentials());
-        }
-    });      
+function fetchData(url,options) {
+    return applyData(url,"GET", options);
 }
 
-function applyData(url, method) {
-    return $.ajax({
-        cache: false,
-        type: method,
-        async: true,
-        url: url,
-        contentType: "application/json",
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Basic " + getBasicAuthFormattedCredentials());
-        }
-    });      
+function applyData(url, method,options) {
+	var params = {
+	        cache: false,
+	        type: method,
+	        async: true,
+	        url: url,
+	        contentType: "application/json",
+	        beforeSend: function (xhr) {
+	            xhr.setRequestHeader("Authorization", "Basic " + getBasicAuthFormattedCredentials());
+	        }
+	    }
+	if(!options){
+		options = {}
+	}
+	$.extend(params,options);
+    return $.ajax(params);      
 }
 
 // Helper function to populate non-existent storyboard

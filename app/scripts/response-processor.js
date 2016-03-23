@@ -41,15 +41,22 @@ function getDataFromLinks(data,iconName) {
             var updated = '';
             var summary = '';
             var linkRelName = data.links[i].rel;
-            var hrefValue = data.links[i].href ? data.links[i].href : data.links[i].hreftemplate;
+            var hrefValue = data.links[i].href;
+            var notSupported = false;
             
             if (linkRelName == constants.linkRelationDql) 
-                setDqlTemplate(hrefValue);
+                setDqlTemplate(data.links[i].hreftemplate);
             else if (linkRelName == constants.linkRelationCheckedOut)
                 setCheckedOutUri(hrefValue);
+            else if (linkRelName == constants.linkRelationBatches)
+            	notSupported = true;
+            
+            if(!hrefValue)
+            	continue;
             
             dataArray.push({
                 uri: hrefValue,
+                notSupported:notSupported,
                 title: normalizeString(linkRelName,'/',true),
                 shorttitle: shorten(normalizeString(linkRelName,'/',true)),
                 description: linkRelName,
@@ -70,7 +77,7 @@ function getDataFromLinks(data,iconName) {
 // This method is common for cabinets/folders and asset objects. 
 function getDataFromEntries(data) {
     if(!data || !data.title || !data.entries)
-        return null;
+        return new Array();
     var iconName = '';
     var isRepository = false;
     if(data.title == "Repositories")
@@ -260,6 +267,35 @@ function getDataFromProperties(data,linkName) {
     dataArray.push(updatableProperties);
     return dataArray;
 }
+
+//Yet another processing of JSON response, data.link array. Used
+//during preview action it will update preview information
+//TODO
+function getTypePropertyInfoFromProperties(data) {
+ var dataArray = new Array();
+ var allProperties = new Array();
+ var properties = data.properties;
+ var attributes;
+ for(var i = 0; i< properties.length; i++) {
+     var property = data.properties[i];
+     attributes = new Array();
+     for(var attribute in property){
+    	 attributes.push({
+             attributeKey: attribute,
+             attributeValue: property[attribute]
+         });
+     }
+     allProperties.push(attributes);
+ }
+ return allProperties;
+}
+
+function getBatchableResourcesFromData(data) {
+	if(data['batchable-resources']&&data['batchable-resources'].length>0){
+		return data['batchable-resources'];
+	}else
+	 return new Array();
+	}
 
 // Yet another processing of JSON response, data.link array. Used
 // during preview action it will update preview information
@@ -501,6 +537,10 @@ function determineResourceType(data) {
         resource = resourceType.object;
     else if (data.name && data.name == "content")
         resource = resourceType.content;
+    else if (data.properties&&data.properties instanceof Array)
+    	resource = resourceType.type;
+    else if (data['batchable-resources'])
+    	resource = resourceType.batchableResources;
     else
         resource = resourceType.unknown;
         

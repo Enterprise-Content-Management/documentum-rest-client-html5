@@ -15,9 +15,11 @@ var constants = {
     'isCheckedOut': 'isCheckedOut',
     'linkRelationObjects': 'http://identifiers.emc.com/linkrel/objects',
     'linkRelationPrimaryContent': 'http://identifiers.emc.com/linkrel/primary-content',
+    'linkRelationContents': 'contents',
     'linkRelationContentMedia': 'http://identifiers.emc.com/linkrel/content-media',
     'linkRelationRepositories': 'http://identifiers.emc.com/linkrel/repositories',
     'linkRelationDql': 'http://identifiers.emc.com/linkrel/dql',
+    'linkRelationBatches': 'http://identifiers.emc.com/linkrel/batches',
     'linkRelationCheckout': 'http://identifiers.emc.com/linkrel/checkout',
     'linkRelationCheckedOut': 'http://identifiers.emc.com/linkrel/checked-out-objects',
     'linkRelationCheckInNextMajor': 'http://identifiers.emc.com/linkrel/checkin-next-major',
@@ -25,6 +27,7 @@ var constants = {
     'linkRelationContents': 'contents',
     'linkRelationAbout': 'about',
     'linkRelationSelf': 'self',
+    'linkRelationParent': 'parent',
     'linkRelationIcon': 'icon',
     'dqlTemplate':'dqlTemplate',
     'checkedOutUri': 'checkedOutUri',
@@ -76,7 +79,9 @@ var resourceType  = {
     'renditions':5,
     'searchresults':6,
     'checkedout':7,
-    'unknown':10
+    'type':8,
+    'batchableResources':9,
+    'unknown':100
 };
 
 var viewType = {

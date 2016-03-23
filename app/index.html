@@ -93,10 +93,9 @@ code {
     <div class="row">
         <ul class="nav nav-tabs" id="tabs">
             <li class="active"><a href="#homeTab" title="Repository Browse Tab" onclick="switchToHomeTab()"><i class="glyphicon glyphicon-home"></i> Home</a></li>
-            <li><a data-toggle="tab" href="#uploadTab" title="Asset Upload Tab" onclick="switchToUploadTab()"><i class="glyphicon glyphicon-cloud-upload"></i> Upload</a></li>
             <li><a data-toggle="tab" href="#searchTab" title="Search Tab" onclick="switchToSearchTab()"><i class="glyphicon glyphicon-search"></i> Search</a></li>
             <li><a data-toggle="tab" href="#checkedOutTab" ng-click="getCheckedOutObjects()" title="CheckedOut Tab"><i class="glyphicon glyphicon-lock"></i> Checked Out</a></li>
-            <li><a href="#checkInTab" title="CheckIn Tab" style="cursor:not-allowed;"><i class="glyphicon glyphicon-cloud-upload" style="cursor:not-allowed;"></i> Check In</a></li>
+            <li><a href="#checkInTab" title="CheckIn Tab" style="cursor:not-allowed;visibility:hidden;"><i class="glyphicon glyphicon-cloud-upload" style="cursor:not-allowed;"></i> Check In</a></li>
         </ul>
     </div>
     <!-- Row for tabs -->
@@ -207,6 +206,40 @@ code {
                                                     <span class="assetProperty">{{entry.propertyKey}}</span>
                                                     :
                                                     <span class="assetPropertyValue">{{entry.propertyValue}}</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        <div id="typePropertiesView">
+                        	<div class="clearfix" ng-repeat="property in typeProperties">
+                                <div class="containerProperties" style="background: rgb(255,229,229);">
+                                    <h6></h6>
+                                    <div class="subContainerProperties propList">
+                                        <div class="propertiesFormatted">
+                                            <ul>
+                                                <li ng-repeat="entry in property">
+                                                    <span class="assetProperty">{{entry.attributeKey}}</span>
+                                                    :
+                                                    <span class="assetPropertyValue">{{entry.attributeValue}}</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        <div id="batchableResourcesView">
+                        	<div class="clearfix">
+                                <div class="containerProperties" style="background: rgb(255,229,229);">
+                                    <h6>Batchable resources</h6>
+                                    <div class="subContainerProperties propList">
+                                        <div class="propertiesFormatted">
+                                            <ul>
+                                                <li ng-repeat="entry in batchableResources">
+                                                    <span class="assetPropertyValue">{{entry}}</span>
                                                 </li>
                                             </ul>
                                         </div>
@@ -439,8 +472,19 @@ function switchToCheckinTab() {
     $('#tabs a[href="#checkInTab"]').tab('show');
 }
 function switchToHomeTab() {
-    resetActiveButtons();
+	resetWidgets();
     $('#tabs a[href="#homeTab"]').tab('show');
+}
+
+
+function switchToHomeTab() {
+	resetWidgets();
+    $('#tabs a[href="#homeTab"]').tab('show');
+}
+
+function switchToCheckedOutTab() {
+	resetWidgets();
+    $('#tabs a[href="#checkedOutTab"]').tab('show');
 }
 
 function switchToUploadTab() {
@@ -460,7 +504,7 @@ $('#tabs a').click(function(e) {
         return false;
     }
     else if (selectedTab == "#homeTab") {
-        resetActiveButtons();
+    	resetWidgets();
     }
     return true;
 });
@@ -494,7 +538,7 @@ function showElement(elementName) {
     if (state != 'block')
     {
         document.getElementById(elementName).style.display = 'block';
-        resetActiveButtons();
+        resetWidgets();
     }
 }
 function hideElement(elementName) {
@@ -502,7 +546,7 @@ function hideElement(elementName) {
     if (state != 'none')
     {
         document.getElementById(elementName).style.display = 'none';
-        resetActiveButtons();
+        resetWidgets();
     }
 }
 
@@ -514,33 +558,93 @@ function disableAllActiveButtons() {
         $(document.getElementById('checkinButton')).addClass("disabled");
 }
 
-function resetActiveButtons() {
-    // Check to enable various action buttons
-    var jsonData = getCurrentObjectJsonRepresentation();
+function resetWidgets(){
+	var jsonData = getCurrentObjectJsonRepresentation();
+	resetPropertiesView(jsonData);
+	resetTypePropertiesView(jsonData);
+	resetBatchableResourcesView(jsonData);
+	resetActiveButtons(jsonData);
+	resetUserProfileControls();
+}
+
+function resetTypePropertiesView(jsonData){
+	
+	if (!jsonData || jsonData === "null") {
+        hideElement('typePropertiesView');
+        return;
+    } 
+	var properties = jsonData.properties;
+	if(!properties){
+		hideElement('typePropertiesView');
+        return;
+	}
+	if(!(properties instanceof Array)){
+		hideElement('typePropertiesView');
+        return;
+	}
+	showElement('typePropertiesView');
+}
+
+function resetBatchableResourcesView(jsonData){
+	
+	if (!jsonData || jsonData === "null") {
+        hideElement('batchableResourcesView');
+        return;
+    } 
+	var resources = jsonData['batchable-resources'];
+	if(!resources){
+		hideElement('batchableResourcesView');
+        return;
+	}
+	if(!(resources instanceof Array)){
+		hideElement('batchableResourcesView');
+        return;
+	}
+	showElement('batchableResourcesView');
+}
+
+function resetPropertiesView(jsonData){
+	if (!jsonData || jsonData === "null") {
+        hideElement('propertiesView');
+        return;
+    } 
+	var properties = jsonData.properties;
+	if(!properties){
+		hideElement('propertiesView');
+        return;
+	}
+	if(properties instanceof Array){
+		hideElement('propertiesView');
+		return;
+	}
+	
+	showElement('propertiesView');
+}
+
+function resetActiveButtons(jsonData) {
+	
     if (!jsonData || jsonData === "null") {
         disableAllActiveButtons();
-        hideElement('propertiesView');
-    } else {
-        showElement('propertiesView');
-        if (jsonData.type === "dm_user"
+    } else if(jsonData.type&&(jsonData.type === "dm_user"
             || jsonData.type === "dm_group"
             || jsonData.type === "dm_format"
             || jsonData.type === "dm_relation"
             || jsonData.type === "dmc_fav_col_relation"
             || jsonData.type === "dm_relation_type"
-            || jsonData.type.name)
-        {
-            disableAllActiveButtons();
-            return;
-        }
-        
+            || jsonData.type.name)){
+    	disableAllActiveButtons();
+    } else if(jsonData['batchable-resources']){
+    	disableAllActiveButtons();
+    } else if(jsonData.properties && jsonData.properties instanceof Array){
+    	disableAllActiveButtons();
+    } else if(jsonData.type && jsonData.type == 'dm_document'){
         if ($(document.getElementById('deleteButton')).hasClass("disabled"))
             $(document.getElementById('deleteButton')).removeClass("disabled");
             
         if ($(document.getElementById('downloadButton')).hasClass("disabled"))
                 $(document.getElementById('downloadButton')).removeClass("disabled");
                 
-        var cancelCheckOutUri = findContentUrlForRelation(jsonData,constants.linkRelationCancelCheckOut);//getKeyValue(jsonData,constants.linkRelationCancelCheckOut);
+        var cancelCheckOutUri = findContentUrlForRelation(jsonData,constants.linkRelationCancelCheckOut);
         if (!cancelCheckOutUri) {
             if ($(document.getElementById('lockButton')).hasClass("disabled")) 
                 $(document.getElementById('lockButton')).removeClass("disabled");
@@ -558,8 +662,15 @@ function resetActiveButtons() {
                 
             $(document.getElementById('lockButton')).addClass("disabled");
         }
+    } else{
+    	disableAllActiveButtons();
+    	if ($(document.getElementById('deleteButton')).hasClass("disabled"))
+            $(document.getElementById('deleteButton')).removeClass("disabled");
     }
-    // Check to enable/disable login/logout actions
+}
+
+function resetUserProfileControls(){
+	// Check to enable/disable login/logout actions
     if(!isUserProfileConfigured()) {
         $(document.getElementById('logincontrol')).removeClass("disabled");
         $(document.getElementById('logoutcontrol')).addClass("disabled");
