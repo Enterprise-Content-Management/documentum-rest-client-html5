@@ -67,7 +67,7 @@ var constants = {
 };
 
 var querySelector = {
-    'searchWithThumbnails':"SELECT r_object_id, object_name, thumbnail_url, r_modify_date, r_object_type FROM dm_document SEARCH DOCUMENT CONTAINS '"
+    'searchWithThumbnails':"SELECT r_object_id, object_name, r_modify_date, r_object_type FROM dm_document SEARCH DOCUMENT CONTAINS '"
 };
 
 var resourceType  = {

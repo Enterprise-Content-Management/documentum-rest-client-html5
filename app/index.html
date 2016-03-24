@@ -369,13 +369,13 @@ code {
                     <div class="col-xm-12 col-sm-12 col-md-12 col-lg-12">
                         <div ng-repeat="entry in searchresultslarge | filter:filter | orderBy:orderList" class="thumbnail col-md-2">
                             <a ng-click="followOnClick(entry)" ng-href="#" title="{{entry.title}}">
-                                <img ng-src="{{entry.realthumbnail}}" width={{entry.thumbnailsize}} height={{entry.thumbnailsize}} class="imgshadow">
+                                <img ng-src="img/document.png" width={{entry.thumbnailsize}} height={{entry.thumbnailsize}} class="imgshadow">
                             </a>
                             <code>{{entry.shorttitle}}</code>
                         </div>
                         <div ng-repeat="entry in searchresultssmall | filter:filter | orderBy:orderList" class="thumbnailsmall col-md-1">
                             <a ng-click="followOnClick(entry)" ng-href="#" title="{{entry.title}}">
-                                <img ng-src="{{entry.realthumbnail}}" width={{entry.thumbnailsize}} height={{entry.thumbnailsize}} class="imgshadow">
+                                <img ng-src="img/document.png" width={{entry.thumbnailsize}} height={{entry.thumbnailsize}} class="imgshadow">
                             </a>
                             <code>{{entry.shorttitle.substring(0,5)}}</code>
                         </div>
@@ -383,7 +383,7 @@ code {
                             <tr ng-repeat="entry in searchresultslistview | filter:filter | orderBy:orderList">
                                 <td>
                                    <a ng-click="followOnClick(entry)" ng-href="#" title="{{entry.title}}">
-                                   <img ng-src="{{entry.realthumbnail}}" width={{entry.thumbnailsize}} height={{entry.thumbnailsize}} class="imgshadow">
+                                   <img ng-src="img/document.png" width={{entry.thumbnailsize}} height={{entry.thumbnailsize}} class="imgshadow">
                                    </a>
                                 </td>
                                 <td>
