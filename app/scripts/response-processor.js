@@ -178,8 +178,16 @@ function getDataFromSearchEntries(data) {
            updated =  updatedCopy;
            summary = summaryCopy;
         }
+        var uri = '';
+        var entry = data.entries[i];
+        for(var j in entry.links){
+        	var link = entry.links[j];
+        	if(link.rel == 'edit'){
+        		uri = link.href;
+        	}
+        }
         assetArray.push({
-            uri: '',//data.entries[i].content.src,
+            uri: uri,
             title: normalizeString(data.entries[i].content.properties.object_name,'/',true),
             shorttitle: shorten(normalizeString(data.entries[i].content.properties.object_name,'/',true)),
             description: data.entries[i].content.name,

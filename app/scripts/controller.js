@@ -69,8 +69,10 @@ app.controller('mainViewController', ['$scope', '$http', '$log',
         		resourceNotSupport();
         		return;
         	}	
+        	switchToHomeTab();
             saveCurrentLocation(entry.uri);
             asyncRefreshView($scope,entry.uri,'progressFeedback');
+            
         };
         
         $scope.followBreadCrumb = function(entry) {
