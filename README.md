@@ -14,15 +14,20 @@ This Documentum REST Services client is written with HTML5 + JavaScript. Underly
 to communicate with Rest server and render the UI. 
 
 ## Environment Preparation
-1. Java 6 or later is installed for REST Services. 
+1. Java 6 or 7 is installed for REST Services. 
 2. Documentum REST Services 7.2 is deployed in the development environment.
-3. Tomcat 7.0 as runtime enviroment for the client.
-3. FireFox, Chrome, IE are all supported. FireFox is recommended.
+3. Tomcat or any other compliant web container for Documentum REST Services 7.2 is installed.
+3. Firefox, Chrome, IE are all supported. FireFox is recommended.
 
 ## How To Use
-1. Download the project files in your development environment 
-2. Adjust Tomcat's *{tomcat_home}/server.xml* file , adding a <context> inside the <Host> element, :
+1. Download the project files to your local storage.
+2. Put the project directory into the web container's deployment directory.
+	Take Tomcat example:
+	Adjust Tomcat's *{tomcat_home}/server.xml* file , adding a <context> inside the <Host> element,
 >      <Context path="/restapp" docBase="{source code root}/app" />
+
+Please note that to avoid Cross-Origin Resource Sharaing (CORS) issues, Documentum REST Services and the HTML5 application are assumed to have the same host and port.
+
 2. Bounce Tomcat.
 3. You now should be able to access this app by entering the following into the browser's URI field **http://demo-server:8080/restapp.
 4. If all goes well, you now should be prompted by the pop up dialog to enter Home Services URI
@@ -31,4 +36,4 @@ to communicate with Rest server and render the UI.
 exposed to the REST services.
 
 ## Known Issues
-1. The resources of search, dql, batches is temporary not supported.
+1. The resources of search, dql, batches are by temporary not supported.
