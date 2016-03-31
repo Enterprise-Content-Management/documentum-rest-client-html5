@@ -22,10 +22,14 @@ to communicate with Rest server and render the UI.
 ## How To Use
 1. Download the project files to your local storage.
 2. Put the project directory into the web container's deployment directory.
+	Take Tomcat example,we need to adjust Tomcat's *{tomcat_home}/server.xml* file , adding a <context> inside the <Host> element.
+
+>     <Context path="/restapp" docBase="{source code root}/app" />
 
 Please note that to avoid Cross-Origin Resource Sharaing (CORS) issues, Documentum REST Services and the HTML5 application are assumed to have the same host and port.
 
 2. Bounce Tomcat.
+3. You now should be able to access this app by entering the following into the browser's URI field **http://demo-server:8080/restapp**.
 4. If all goes well, you now should be prompted by the pop up dialog to enter Home Services URI
 (ie. http://demo-server:8080/dctm-rest/services.json) and user credentials - and hit OK.
 5. Again - if all goes well, you'll see progress feedback and then UI should be repainted with selection of Repositories
