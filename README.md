@@ -13,6 +13,8 @@ of the referenced libraries used by this sample project.
 This Documentum REST Services client is written with HTML5 + JavaScript. Underlying it leverages AngularJS and Bootstrap 
 to communicate with Rest server and render the UI. 
 
+<img src="/resources/dctm-rest-html5.png?raw=true" width="500">
+
 ## Environment Preparation
 1. Java 6 or 7 is installed for REST Services. 
 2. Documentum REST Services 7.2 is deployed in the development environment.
