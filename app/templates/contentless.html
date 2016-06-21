@@ -1,0 +1,85 @@
+<div class="row">
+    <div class="col-xs-8 col-sm-6 col-md-7 col-lg-7" id="navigation">
+        <button type="button" id="backButton" class="btn btn-primary" title="Go Back" ng-click="goBack(entry)">
+            <i class="glyphicon glyphicon-backward"></i>
+            <span></span>
+        </button>
+        <button type="button" id="deleteButton" class="btn btn-danger {{canDelete}}" title="Delete This Asset" ng-click="deleteAsset()">
+            <i class="glyphicon glyphicon-trash"></i>
+            <span></span>
+        </button>
+    </div>
+</div>
+<div class="row">
+	<div class="col-xs-6 col-sm-4 col-md-3 col-lg-3">
+	    <div class="clearfix">
+	        <div class="containerProperties">
+	            <h6>Asset Properties</h6>
+	            <div class="subContainerProperties propList">
+	                <div class="propertiesFormatted">
+	                    <ul>
+	                        <li ng-repeat="entry in updatableProperties | filter:filter">
+	                            <span class="assetProperty">{{entry.propertyKey}}</span>
+	                            :
+	                            <span class="assetPropertyValue">{{entry.propertyValue}}</span>
+	                        </li>
+	                    </ul>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="clearfix">
+	        <div class="containerProperties" style="background: rgb(148,219,255);">
+	            <h6>Application Properties</h6>
+	            <div class="subContainerProperties propList">
+	                <div class="propertiesFormatted">
+	                    <ul>
+	                        <li ng-repeat="entry in applicationProperties | filter:filter">
+	                            <span class="assetProperty">{{entry.propertyKey}}</span>
+	                            :
+	                            <span class="assetPropertyValue">{{entry.propertyValue}}</span>
+	                        </li>
+	                    </ul>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="clearfix">
+	        <div class="containerProperties" style="background: rgb(255,255,148);">
+	            <h6>Internal Properties</h6>
+	            <div class="subContainerProperties propList">
+	                <div class="propertiesFormatted">
+	                    <ul>
+	                        <li ng-repeat="entry in internalProperties | filter:filter">
+	                            <span class="assetProperty">{{entry.propertyKey}}</span>
+	                            :
+	                            <span class="assetPropertyValue">{{entry.propertyValue}}</span>
+	                        </li>
+	                    </ul>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="clearfix">
+	        <div class="containerProperties" style="background: rgb(255,229,229);">
+	            <h6>Read Only Properties</h6>
+	            <div class="subContainerProperties propList">
+	                <div class="propertiesFormatted">
+	                    <ul>
+	                        <li ng-repeat="entry in readOnlyProperties | filter:filter">
+	                            <span class="assetProperty">{{entry.propertyKey}}</span>
+	                            :
+	                            <span class="assetPropertyValue">{{entry.propertyValue}}</span>
+	                        </li>
+	                    </ul>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</div> 
+	<div class="col-md-5"><!-- start of preview section -->
+	     <div ng-repeat="entry in links">
+	         <img ng-src="{{entry.preview}}" height="400" class="preview"><!-- width="400" -->
+	     </div>
+	</div>
+</div>

@@ -95,7 +95,7 @@ var targetResult;
 var filename;
 var span;
 var file;
-var thumbnailElementId;
+var thumbnailElementId = 'thumbnailCheckin';
 
 function handleFileSelectCheckin(evt) {
     var files = evt.target.files; // FileList object
@@ -142,51 +142,6 @@ function handleFileSelectCheckin(evt) {
       binaryReader.readAsBinaryString(f);
     }
 }
-
-function handleFileSelectImport(evt) {
-    var files = evt.target.files; // FileList object
-    var imageDetected = true;
-    // Loop through the FileList and render image files as thumbnails.
-    for (var i = 0, f; f = files[i]; i++) {
-      // Only process image files.
-      if (!f.type.match('image.*')) {
-        imageDetected = false;
-      }
-
-      var thumbReader = new FileReader();
-      var binaryReader = new FileReader();
-      thumbReader.onload = (function(theFile) {
-        return function(e) {
-          // Render thumbnail.
-          if (span) 
-            document.getElementById(thumbnailElementId).removeChild(span);
-          
-          span = document.createElement('span');
-          if (!imageDetected) 
-                span.innerHTML = ['<img class="thumb" src="img/Unknown.jpg" style="z-index: 1;"/><br>'].join('');
-            else 
-                span.innerHTML = ['<img class="thumb" src="', e.target.result,
-                            '" title="', escape(theFile.name), '"style="z-index: 1;"/><br>'].join('');
-          thumbnailElementId = 'thumbnailImport';
-          document.getElementById(thumbnailElementId).insertBefore(span, null);
-          file = theFile;
-        };
-      })(f);
-      
-      // Closure to capture the file information.
-      binaryReader.onload = (function(theFile) {
-        return function(e) {
-            $(document.getElementById('startImportButton')).removeClass("disabled");
-            targetResult = e.target.result;
-            filename = theFile.name;
-        };
-      })(f);
-      // Read in the image file as a data URL.
-      thumbReader.readAsDataURL(f);
-      binaryReader.readAsBinaryString(f);
-    }
-}
-
 
 function uploadContent(uri,appendProperties) {
     var formData = appendProperties? $('form').serializeObject() : null;

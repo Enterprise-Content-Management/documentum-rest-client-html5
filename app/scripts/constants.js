@@ -13,12 +13,14 @@ var constants = {
     'currentObjectCheckInUri': 'currentObjectCheckInUri',
     'currentObjectJsonRepresentation': 'currentObjectJsonRepresentation',
     'isCheckedOut': 'isCheckedOut',
+    'linkRelationDelete': 'http://identifiers.emc.com/linkrel/delete',
     'linkRelationObjects': 'http://identifiers.emc.com/linkrel/objects',
     'linkRelationPrimaryContent': 'http://identifiers.emc.com/linkrel/primary-content',
     'linkRelationContents': 'contents',
     'linkRelationContentMedia': 'http://identifiers.emc.com/linkrel/content-media',
     'linkRelationRepositories': 'http://identifiers.emc.com/linkrel/repositories',
     'linkRelationDql': 'http://identifiers.emc.com/linkrel/dql',
+    'linkRelationSearch':'http://identifiers.emc.com/linkrel/search',
     'linkRelationBatches': 'http://identifiers.emc.com/linkrel/batches',
     'linkRelationCheckout': 'http://identifiers.emc.com/linkrel/checkout',
     'linkRelationCheckedOut': 'http://identifiers.emc.com/linkrel/checked-out-objects',
@@ -41,6 +43,7 @@ var constants = {
     'iconBook': 'glyphicon glyphicon-book',
     'deleteEnabled': 'deleteEnabled',
     'documentStaticImage': 'img/document.png',
+    'contentfulStaticImage': 'img/contentful.png',
     'repositoryStaticImage': 'img/i-repo.png',
     'userStaticImage': 'img/user.jpg',
     'groupStaticImage': 'img/group.jpg',
@@ -81,6 +84,9 @@ var resourceType  = {
     'checkedout':7,
     'type':8,
     'batchableResources':9,
+    'contentless':10,
+    'contentful':11,
+    'folder':12,
     'unknown':100
 };
 

@@ -1,0 +1,17 @@
+<div class="row">
+    <table class="table table-hover table-condensed">
+        <tr ng-repeat="entry in checkedoutlistview | filter:filter | orderBy:orderList">
+            <td>
+               <a ng-click="getCheckedOutDetails(entry)" ng-href="#" title="{{entry.title}}">
+                <img ng-src="{{entry.realthumbnail}}" width={{entry.thumbnailsize}} height={{entry.thumbnailsize}} class="imgshadow">
+               </a>
+            </td>
+            <td>
+               <a ng-click="getCheckedOutDetails(entry)" ng-href="#" title="additional information" class="list-group-itemx">  {{entry.title}} </a>
+            </td>
+            <td>{{entry.updated}}</td>
+            <td>{{entry.summary}}</td>
+            <td><i class="fa fa-lock fa-1x"></i></td>
+        </tr>
+    </table>
+</div>

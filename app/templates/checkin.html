@@ -1,0 +1,27 @@
+<div class="row">
+    <div class="col-xs-6 col-sm-4 col-md-5 col-lg-5">
+        <div class="well well-sm"><i>Please select updated content file</i></div>
+        <input type="file" id="fileSelectorCheckin" name="files[]" />
+        <output id="thumbnailCheckin"></output>
+        <br>
+        <br>
+        <button type="button" ng-click="startCheckInProcess()" id="startCheckInButton" class="btn btn-primary disabled" title="Check In This Asset">Check In</button>
+        <br>
+        <form id="checkin">
+            <fieldset>
+                <legend>Update Properties</legend>
+                <ol>
+                    <li ng-repeat="entry in updatableProperties | filter:filter">
+                        <label for=name >{{entry.propertyKey}}</label>
+                        <input  id='name' name='{{entry.propertyKey}}' type='text' placeholder='{{entry.propertyValue}}' required>
+                    </li>
+                </ol>
+            </fieldset>                          
+        </form>
+     </div><!-- ends common section for list view (collections) and properties -->
+    <div class="col-md-5"><!-- start of preview section -->
+        <div ng-repeat="entry in links">
+            <img ng-src="{{entry.preview}}" width="400" height="400" class="thumbnail">
+        </div>
+    </div><!-- end of preview -->
+</div><!-- end preview row -->

@@ -59,7 +59,7 @@ function resourceNotSupport() {
 }
 
 // Delete asset from here   
-function deleteCurrentAsset($scope) {
+function deleteCurrentAsset($scope,data,viewDataStore) {
     bootbox.dialog({
         message: "Are you sure you want to delete this asset?",
         title: "You're about to delete asset",
@@ -78,21 +78,22 @@ function deleteCurrentAsset($scope) {
                 label: "Yes, destroy it",
                 className: "btn-primary",
                 callback: function() {
-                    showAssetInteractingFeedback();
                     $.ajax({
                         cache: false,
                         type: "DELETE",
                         async: true,
-                        url: getCurrentObjectReference(),
+                        url: findContentUrlForRelation(data,constants.linkRelationDelete),
                         contentType: "application/json",
                         beforeSend: function (xhr)
                         {
                             xhr.setRequestHeader("Authorization", "Basic " + getBasicAuthFormattedCredentials());
                         },
                         success: function (data) {
-                            hideAssetInteractingFeedback();
                             goOneStepBack();
-                            asyncRefreshView($scope,getCurrentLocation(),'progressFeedback');
+                            $scope.breadcrumbsData = getBreadcrumbs();
+                            var entry = {crumb:getLastValueFromBreadCrumbs(),uri:getLastHrefFromBreadCrumbs()};
+                            asyncRefreshView($scope,entry,viewDataStore);
+                            $scope.$apply();
                         }
                     });
                 }

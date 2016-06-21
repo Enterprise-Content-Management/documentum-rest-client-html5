@@ -34,7 +34,7 @@ function getKeyValue(obj, key) {
 // parsing routines based on given JSON structure. This one processes data.links array
 // We pass JSON data object, name of icon for list view, label for displayText element as
 // well as 'self' object reference
-function getDataFromLinks(data,iconName) {
+function getDataFromLinks(data) {
     var dataArray = new Array();
     if(data && data.links)
         for (var i = 0; i < data.links.length; i++) {
@@ -43,24 +43,29 @@ function getDataFromLinks(data,iconName) {
             var linkRelName = data.links[i].rel;
             var hrefValue = data.links[i].href;
             var notSupported = false;
+            var title = normalizeString(linkRelName,'/',true);
             
-            if (linkRelName == constants.linkRelationDql) 
-                setDqlTemplate(data.links[i].hreftemplate);
-            else if (linkRelName == constants.linkRelationCheckedOut)
-                setCheckedOutUri(hrefValue);
-            else if (linkRelName == constants.linkRelationBatches)
+            if (linkRelName == constants.linkRelationDql){
+            	setDqlTemplate(data.links[i].hreftemplate);
+            	title = "search-by-name";
+            }
+            else if (linkRelName == constants.linkRelationBatches){
             	notSupported = true;
+            }
             
             if(!hrefValue)
+            	hrefValue = data.links[i].hreftemplate;
+            
+            if(linkRelName == constants.linkRelationSearch)
             	continue;
             
             dataArray.push({
                 uri: hrefValue,
+                linkRelName:linkRelName,
                 notSupported:notSupported,
-                title: normalizeString(linkRelName,'/',true),
-                shorttitle: shorten(normalizeString(linkRelName,'/',true)),
+                title: title,
+                shorttitle: shorten(title),
                 description: linkRelName,
-                relimagelink: iconName,
                 realthumbnail: constants.repositoryStaticImage,
                 thumbnailsize: getThumnbailSize(),
                 updated: updated,
@@ -241,7 +246,7 @@ function getDataFromProperties(data,linkName) {
                     propertyValue: value
                 });
         }
-    else if (data.type.properties) {
+    else if (data.type&&data.type.properties) {
         for(key in data.type.properties) {
             var value = data.type.properties[key];
             var name = value['name'];
@@ -395,23 +400,139 @@ function findUrlGivenLinkRelation(data, relName) {
     return uri;
 }
 
-// For service resource we want to find URL to repositories resource
-// and URL to version resource
-function processServiceResource(data,displayText,self) {
-    resetBreadCrumbs();
-    for(key in data.resources) {
-        if(key == constants.linkRelationRepositories)
-            saveCurrentLocation(data.resources[key]["href"]);
-        else if(key == constants.linkRelationAbout)
-            setVersionInfoReference(data.resources[key]["href"]);
-    }
+function processCollection(data,$scope,viewDataStore){
+    if ((data.title) && !data.title.startsWith('Objects under')) 
+        appendToBreadCrumbs(data.title,findContentUrlForRelation(data,constants.linkRelationSelf));
+    $scope.breadcrumbsData = getBreadcrumbs();
+    viewDataStore.setData(data);
+    toTemplate("/collection");
+}
+
+function processCheckedOutObjects(data,$scope,viewDataStore){
+	//TODO checkedout tab
+	appendToBreadCrumbs(data.title,findContentUrlForRelation(data,constants.linkRelationSelf));
+    $scope.breadcrumbsData = getBreadcrumbs();
+    viewDataStore.setData(data);
+    toTemplate("/collection");
+}
+
+function processFolder(data,$scope,viewDataStore){
+	var uri = findUrlGivenLinkRelation(data,constants.linkRelationObjects);
+	var self = findContentUrlForRelation(data,constants.linkRelationSelf);
+    appendToBreadCrumbs(data.properties.object_name,self);
+    setCurrentObjectJsonRepresentation(null);
+    saveCurrentLocation(self);
+    asyncRefreshView($scope,uri,viewDataStore);
+}
+
+function processContentlessObject(data,$scope,viewDataStore){
+	var breadCrumbsName = 'object';
+	if(data.name == "user"){
+		breadCrumbsName = data.properties.user_name
+	}else if (data.name == "group"){
+		breadCrumbsName = data.properties.group_name
+	}else if( data.name == "format"){
+		breadCrumbsName = data.properties.name
+	}else if( data.name == "relation" || data.name == "relation-type"){
+		breadCrumbsName = data.properties.relation_name
+	}else if( data.name == "network-location"){
+		breadCrumbsName = data.properties.netloc_ident
+	}else if( data.type ){
+		breadCrumbsName = data.type.name?data.type.name : data.type;
+	}
+	var self = findContentUrlForRelation(data,constants.linkRelationSelf);
+	appendToBreadCrumbs(breadCrumbsName,self);
+	saveCurrentLocation(self);
+	$scope.breadcrumbsData = getBreadcrumbs();
+	viewDataStore.setData(data);
+    toTemplate("/contentless");
+    
+}
+
+function processContentfulObject(data,$scope,viewDataStore){
+	appendToBreadCrumbs(data.properties.object_name,findContentUrlForRelation(data,constants.linkRelationSelf));
+	$scope.breadcrumbsData = getBreadcrumbs();
+    viewDataStore.setData(data);
+    toTemplate("/contentful");
+}
+
+function processTypeResource(data,$scope,viewDataStore){
+    var self = findContentUrlForRelation(data,constants.linkRelationSelf);
+    saveCurrentLocation(self);
+    appendToBreadCrumbs(data.name,self);
+    $scope.breadcrumbsData = getBreadcrumbs();
+    viewDataStore.setData(data);
+    toTemplate("/type");
+}
+
+function processBatchableResources(data,$scope,viewDataStore){
+	var self = findContentUrlForRelation(data,constants.linkRelationSelf);
+	saveCurrentLocation(self);
+    appendToBreadCrumbs("batchable-resources",self);
+    $scope.breadcrumbsData = getBreadcrumbs();
+    viewDataStore.setData(data);
+    toTemplate("/batchables");
+}
+
+function processRepositoryResource(data,$scope,viewDataStore){
+    var crumbData = data.name;
+    if(!crumbData)
+        crumbData = data.title;
+    appendToBreadCrumbs(crumbData,findContentUrlForRelation(data,constants.linkRelationSelf));
+    $scope.breadcrumbsData = getBreadcrumbs();
+    saveCurrentLocation(findContentUrlForRelation(data,constants.linkRelationSelf));
+    setCurrentObjectJsonRepresentation(null);
+    viewDataStore.setData(data);
+    toTemplate("/repository");
+}
+
+function processServicesResource(data,uri,$scope,viewDataStore){
+	//clear bread crumbs, start from scratch
+	resetBreadCrumbs();
+	appendToBreadCrumbs('Services',uri);
+	var repositoriesLink = getRepositoriesLinkRelInServices(data);
+	var aboutLink = getAboutRepositoriesLinkRelInServices(data);
+    setVersionInfoReference(aboutLink);
+    $scope.breadcrumbsData = getBreadcrumbs();
+    setCurrentObjectJsonRepresentation(null);
+    asyncRefreshView($scope,repositoriesLink,viewDataStore);
+}
+
+function toTemplate(path){
+	location.hash = "";
+	localStorage["currentTemplate"] =  path;
+	location.hash = path;
+}
+
+function toSeachTabView(){
+	location.hash = "";
+	location.hash = "/search";
+}
+
+function getRepositoriesLinkRelInServices(data) {
+	if(data.resources&&data.resources[constants.linkRelationRepositories]&&data.resources[constants.linkRelationRepositories].href){
+		return data.resources[constants.linkRelationRepositories].href;
+	}
+	return null;
+}
+
+function getAboutRepositoriesLinkRelInServices(data) {
+	if(data.resources&&data.resources[constants.linkRelationAbout]&&data.resources[constants.linkRelationAbout].href){
+		return data.resources[constants.linkRelationAbout].href;
+	}
+	return null;
 }
 
 // Convoluted logic to find best preview for given asset
 // It varies based on renditions available and given format object
 function findLinkToPreview(data) {
-    if(!data || !data.entries)
-        return null;
+    if(!data){
+    	data = {}
+    }
+    if(!data.entries){
+    	data.entries = [];
+    }
+        
     var contenturl = null;
     var previewlocation = null;
     var lreslocation = null;
@@ -527,30 +648,49 @@ function getCombinedStoryBoard(data,linkRelName) {
 
 // Look at the JSON structure and determine what resource we're dealing with
 function determineResourceType(data) {
-    var resource;
-    if ((data.resources))
-        resource = resourceType.service;
+    var resource = resourceType.unknown;
+    if (data.resources)
+    	return resourceType.service;
     else if (data.servers)
-        resource = resourceType.repository;
+    	return resourceType.repository;
     else if (data.title)
         if (data.title.startsWith("Contents of"))
-            resource = resourceType.renditions;
+        	return resourceType.renditions;
         else if (data.title.startsWith("DQL query results"))
-            resource = resourceType.searchresults;
+        	return resourceType.searchresults;
         else if (data.title.startsWith("Checked-out objects"))
-            resource = resourceType.checkedout;
+        	return resourceType.checkedout;
         else
-            resource = resourceType.collection;
-    else if (data.type)
-        resource = resourceType.object;
-    else if (data.name && data.name == "content")
-        resource = resourceType.content;
+            return resourceType.collection;
     else if (data.properties&&data.properties instanceof Array)
-    	resource = resourceType.type;
+    	return resourceType.type;
     else if (data['batchable-resources'])
-    	resource = resourceType.batchableResources;
-    else
-        resource = resourceType.unknown;
+    	return resourceType.batchableResources;
+    else if (data.name){
+    	resource = resourceType.object;
+    	if(data.name === "content"){
+    		return resourceType.content;
+    	}else if (data.type === "dm_cabinet" || data.type === "dm_folder") {
+    		return resourceType.folder;
+        }else if (data.name === "user"
+               || data.name === "group"
+               || data.name === "format"
+               || data.name === "relation"
+               || data.name === "relation-type"
+               || data.name === "network-location"
+               || (data.type&&data.type.name)) {
+        	return resourceType.contentless;
+        }else if(data.links){
+        	var links = data.links;
+        	var link;
+        	for(var i = 0; i<links.length;i++){
+        		link = links[i];
+        		if(link.rel === constants.linkRelationPrimaryContent){
+        			return resourceType.contentful;
+        		}
+        	}
+        }
+    }
         
     return resource;   
 }

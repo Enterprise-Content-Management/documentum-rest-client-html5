@@ -1,0 +1,36 @@
+
+
+<div class="col-xs-6 col-sm-4 col-md-3 col-lg-3">
+	<div class="list-group">
+	    <a ng-repeat="entry in folders | filter:filter | orderBy:orderList" ng-click="followOnClick(entry)" href="#" class="list-group-item">
+	      <i class="fa fa-folder-open-o "></i> {{entry.title}}</a>
+	</div>
+</div>
+<div class="col-xs-4 col-sm-3 col-md-9 col-lg-9">
+    <div ng-repeat="entry in assetslarge | filter:filter | orderBy:orderList" class="thumbnail col-md-2">
+       <a ng-click="followOnClick(entry)" ng-href="#" title="{{entry.title}}">
+           <img ng-src="{{entry.realthumbnail}}" width={{entry.thumbnailsize}} height={{entry.thumbnailsize}} class="imgshadow">
+       </a>
+       <code>{{entry.shorttitle}}</code>
+    </div>
+    <div ng-repeat="entry in assetssmall | filter:filter | orderBy:orderList" class="thumbnailsmall col-md-1">
+       <a ng-click="followOnClick(entry)" ng-href="#" title="{{entry.title}}">
+           <img ng-src="{{entry.realthumbnail}}" width={{entry.thumbnailsize}} height={{entry.thumbnailsize}} class="imgshadow">
+       </a>
+       <code>{{entry.shorttitle.substring(0,5)}}</code>
+    </div>
+    <table class="table table-hover table-condensed">
+        <tr ng-repeat="entry in listview | filter:filter | orderBy:orderList">
+         <td>
+            <a ng-click="followOnClick(entry)" ng-href="#" title="{{entry.title}}">
+            <img ng-src="{{entry.realthumbnail}}" width={{entry.thumbnailsize}} height={{entry.thumbnailsize}} class="imgshadow">
+            </a>
+         </td>
+         <td>
+            <a ng-click="followOnClick(entry)" ng-href="#" title="additional information" class="list-group-itemx">  {{entry.title}} </a>
+         </td>
+         <td>{{entry.updated}}</td>
+         <td>{{entry.summary}}</td>
+        </tr>
+    </table>
+</div>  

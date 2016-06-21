@@ -1,0 +1,21 @@
+<div class="col-xs-6 col-sm-4 col-md-3 col-lg-3">
+	<div class="clearfix">
+        <div class="containerProperties" style="background: rgb(255,229,229);">
+            <h6>Batchable resources</h6>
+            <div class="subContainerProperties propList">
+                <div class="propertiesFormatted">
+                    <ul>
+                        <li ng-repeat="entry in  batchableResources">
+                            <span class="assetPropertyValue">{{entry}}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+<div class="col-md-5"><!-- start of preview section -->
+    <div ng-repeat="entry in links">
+        <img ng-src="{{entry.preview}}" height="400" class="preview"><!-- width="400" -->
+    </div>
+</div>

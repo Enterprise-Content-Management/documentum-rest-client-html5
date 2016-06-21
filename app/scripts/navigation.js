@@ -59,11 +59,10 @@ function resetNavigation() {
 function resumeBrowse() {
     if(!supportsHtml5Storage())
             return false;
-    var whereToLoad = getCurrentLocation();
+    var whereToLoad = getLastHrefFromBreadCrumbs();
     if (!whereToLoad)
-        whereToLoad = getHomeUri();
-
-    return whereToLoad;
+        return getHomeUri();
+    return {crumb:getLastValueFromBreadCrumbs(),uri:getLastHrefFromBreadCrumbs()};
 }
 
 window.onload = function() {

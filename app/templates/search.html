@@ -1,0 +1,38 @@
+<div class="row">
+    <form>
+        <div class="col-md-3">
+          <input type="text" class="form-control" placeholder="Search" ng-model="searchText">
+        </div>
+        <button ng-click="startSearch()" class="btn btn-default"><i class="glyphicon glyphicon-play-circle"></i> Go</button>
+    </form>
+</div>
+<div class="row">
+    <div class="col-xm-12 col-sm-12 col-md-12 col-lg-12">
+        <div ng-repeat="entry in searchresultslarge | filter:filter | orderBy:orderList" class="thumbnail col-md-2">
+            <a ng-click="followOnClick(entry)" ng-href="#" title="{{entry.title}}">
+                <img ng-src="img/document.png" width={{entry.thumbnailsize}} height={{entry.thumbnailsize}} class="imgshadow">
+            </a>
+            <code>{{entry.shorttitle}}</code>
+        </div>
+        <div ng-repeat="entry in searchresultssmall | filter:filter | orderBy:orderList" class="thumbnailsmall col-md-1">
+            <a ng-click="followOnClick(entry)" ng-href="#" title="{{entry.title}}">
+                <img ng-src="img/document.png" width={{entry.thumbnailsize}} height={{entry.thumbnailsize}} class="imgshadow">
+            </a>
+            <code>{{entry.shorttitle.substring(0,5)}}</code>
+        </div>
+        <table class="table table-hover table-condensed">
+            <tr ng-repeat="entry in searchresultslistview | filter:filter | orderBy:orderList">
+                <td>
+                   <a ng-click="followOnClick(entry)" ng-href="#" title="{{entry.title}}">
+                   <img ng-src="img/document.png" width={{entry.thumbnailsize}} height={{entry.thumbnailsize}} class="imgshadow">
+                   </a>
+                </td>
+                <td>
+                   <a ng-click="followOnClick(entry)" ng-href="#" title="additional information" class="list-group-itemx">  {{entry.title}} </a>
+                </td>
+                <td>{{entry.updated}}</td>
+                <td>{{entry.summary}}</td>
+            </tr>
+        </table>
+    </div>
+</div>
