@@ -1,7 +1,7 @@
 Documentum REST HTML5 Client Samples
 =========
 
-[![License: Apache 2](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![License: Apache 2](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 This project contains a reference implementation of Documentum REST Services client written in HTML5 + JavaScript code.
 The purpose of this project is to demonstrate one way to develop a hypermedia driven REST client to consume Documentum
